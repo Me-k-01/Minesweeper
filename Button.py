@@ -30,30 +30,42 @@ class Button(Widget) :
         self.selected = self.detect(cursor["x"], cursor["y"])
         if not self.pushed:
             if self.selected :
+                self.grow(0)
                 self.render(self.thm[1])
             else:
+                self.grow(0)
                 self.render(self.thm[0])
 
     def onPress(self, cursor):
         if self.selected :
             self.pushed = True
+            self.grow(5)
             self.render(self.thm[2])
+
 
     def onRelease(self, cursor):
         if self.selected:
             if self.pushed:
                 self.function()
+                self.grow(0)
                 self.render(self.thm[1])
             else:
+                self.grow(0)
                 self.render(self.thm[0])
         else:
+            self.grow(0)
             self.render(self.thm[0])
         self.pushed = False
 
-
-    def render(self, color):
+    def clear(self):
         self.cv.delete(self.wdg)
         self.cv.delete(self.txt)
+
+    def grow(self, v=0):
+        self.rect = [self.x-v, self.y-v, self.x+self.w+v, self.y+self.h+v]
+
+    def render(self, color):
+        self.clear()
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="")
         self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, text=self.name, fill="#EEEEEE")
