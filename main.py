@@ -32,7 +32,8 @@ def drawCube(cv, x, y, w, h):
 
 drawCube(cv, cursor["x"]-50, cursor["y"] - 50, 100, 100)
 
-button = Button(cv, 0, 0, 200, 100,lambda: print("a cliqué sur le boutton!") )
+# pour mettre une fonction qui a un parametre il faut mettre lambda:.
+button = Button(cv, 0, 0, 200, 100, "yeeeeeet" )
 
 
 def motion(event):
