@@ -1,17 +1,16 @@
 from tkinter import Tk, Canvas, PhotoImage
 from Menu import *
+import Config, Game
 
+#### Variables ####
 width, height = 700, 700
-theme = ["#0e0e0f", "#444433", "#998755"]
-menuTheme = ["#141417", "#25242e", "#343444"]
-cursor = { "x": 500, "y": 200 }
-
-# App set up
+theme = Config.mainTheme["default"]
+menuTheme = Config.bgTheme["night"]
+cursor = { "x": 0, "y": 0 }  # on stockera les coordonnées du cursor dans un dictionaire pour forcer le passage par reference.
+#### Set up de la fenetre Tkinter ####
 root = Tk()
 cv = Canvas(root, width=width, height=height, bg=menuTheme[-1])
 cv.pack()
-menu = Menu(cv, (width, height), menuTheme)
-menu.buttonArray = []  # On place la liste des bouttons dans l'objet menu pour que cette variable soit accessible et modifiable partout car cela force le passage par reference dans la mainloop de tkinter.
 
 def createButton(buttonArray, thm):
     """Fonction quit creer une liste de boutton"""
@@ -24,12 +23,15 @@ def createButton(buttonArray, thm):
     buttonArray.append( Button(cv, width - 200, height//5 + 300, 200, 100, "Quit", root.destroy , thm ) )
 
 
+menu = Menu(cv, (width, height), menuTheme)
+menu.buttonArray = []  # On place la liste des bouttons dans l'objet menu pour que cette variable soit accessible et modifiable partout car cela force le passage par reference dans la mainloop de tkinter.
 createButton(menu.buttonArray, theme)
 
 def motion(event):
     """Runs everytime the cursor moves on the tkinter window."""
     cursor["x"], cursor["y"] = event.x, event.y
     for b in menu.buttonArray: # Pour chaque boutton dans la liste de boutton
+
         b.onMotion(cursor) # On execute la fonction associé à l'évènement.
 
 def mousePress(event):
