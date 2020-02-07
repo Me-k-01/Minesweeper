@@ -17,7 +17,7 @@ class MineField :
     def placeMine(self) :
         n, p = self.n, self.p
 
-        def blankMatrice(n, p) :
+        def blankMatrice(n, p):
             matrice = []
             for i in range(n):
                 matrice.append([])
