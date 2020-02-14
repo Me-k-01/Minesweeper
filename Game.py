@@ -1,9 +1,12 @@
 from random import randrange as rdm
 
-def afficher(M) :
+def disp(M) :
     for l in M:
         for x in l:
-            print(x, end=" ")
+            spacing = ""
+            if ( x >= 0 ):
+                spacing = " "
+            print(spacing, x, end="")
 
         print()
 
@@ -45,7 +48,7 @@ class MineField :
                 self.nMine -= 1
                 self.m = addToAdj(self.m, x, y)
 
-        afficher(self.m)
+        disp(self.m)
 
 class Game:
     def __init__(self):

@@ -6,7 +6,7 @@ import Config, Game
 width, height = 700, 700
 theme = Config.mainTheme["default"]
 menuTheme = Config.bgTheme["night"]
-cursor = { "x": 0, "y": 0 }  # on stockera les coordonnées du cursor dans un dictionaire pour forcer le passage par reference.
+cursor = { "x": 0, "y": 0 }  # on stockera les coordonnees du cursor dans un dictionaire pour forcer le passage par reference.
 #### Set up de la fenetre Tkinter ####
 root = Tk()
 cv = Canvas(root, width=width, height=height, bg=menuTheme[-1])
