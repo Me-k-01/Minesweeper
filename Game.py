@@ -17,6 +17,7 @@ class MineField :
         self.p = p
         self.nMine = nMine
 
+
     def placeMine(self) :
         n, p = self.n, self.p
 
@@ -51,19 +52,35 @@ class MineField :
         disp(self.m)
 
 class Game:
-    def __init__(self):
-        self.n = 5  # Hauteur
-        self.p = 6  # Longueur
+    def __init__(self, cv, theme):
+        self.n = 10  # Hauteur
+        self.p = 10  # Longueur
         self.bomb = 9 # Nombre de bombe
+        self.mf = MineField(self.n, self.p, self.bomb)
 
-        self.mf = MineField(10, 10, 9)
+        self.cv = cv
+        self.theme = theme
 
     def changeDim(self, n, p):
         self.n = n
         self.p = p
+        self.draw()
 
-    def start(self):
+    def destroy(self):
+        self.cv.delete("MineField")
+
+    def draw(self, startAtCoord):
+        w = 25 # Taille des blocks
+        d = 2  # Distance de l'espacement entre chaque block.
+        x, y = startAtCoord  # On commence a une certaine distance du bord de l'ecran.
+        self.destroy()
+        for i in range(self.n):
+            for j in range(self.p):
+                x += w + d
+                self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
+            x = startAtCoord[0]
+            y += w + d
+
+    def start(self, startAt):
         self.mf.placeMine()
-
-game = Game()
-game.start()
+        self.draw(startAt)

@@ -44,6 +44,9 @@ def mouseRelease(event):
     for b in menu.buttonArray:
         b.onRelease(cursor)
 
+game = Game.Game(cv, theme)
+game.start((10, 150))
+
 cv.bind('<Motion>', motion)
 cv.bind('<ButtonPress-1>', mousePress )
 cv.bind('<ButtonRelease-1>', mouseRelease )
