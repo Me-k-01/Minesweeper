@@ -29,7 +29,8 @@ class Button(Widget) :
         self.pushed = False
 
     def onMotion(self, cursor):
-        self.selected = self.detect(cursor["x"], cursor["y"])
+
+        self.selected = self.detect( cursor[0], cursor[1] )
         if not self.pushed:
             if self.selected :
                 self.grow(0)
@@ -41,13 +42,13 @@ class Button(Widget) :
             if self.selected:
                 self.render(self.thm[2])
 
-    def onPress(self, cursor):
+    def onPress(self):
         if self.selected :
             self.pushed = True
             self.grow(5)
             self.render(self.thm[2])
 
-    def onRelease(self, cursor):
+    def onRelease(self):
         if self.selected:
             if self.pushed:
                 self.grow(0)
@@ -81,3 +82,41 @@ class Button(Widget) :
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="", tag="Button")
         self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, text=self.name, fill="#d9d6c6", tag="Button")
+
+
+
+
+
+
+class Menu :
+    def __init__(self, cv, x, y, w, h, thm=["#373533", "#403e3c"] ):
+        self.cv = cv
+        self.isActive = True  # L'état de l'ensemble (visuel + de l'interactivité) des boutons.
+        self.buttons = []  # Liste de tout les boutons du menu
+
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+        self.thm = thm
+
+    def addButton(self, title="Button", function=lambda : print("Comming soon")):
+        self.buttons.append(Button(self.cv, self.x, self.y, self.w, self.h, title, function, self.thm))
+        self.y += 100
+
+    def updateOnPress(self):
+        """The update of a all buttons when left clicking with the mouse"""
+        if self.isActive:
+            for button in self.buttons:
+                button.onPress()
+
+    def updateOnRelease(self):
+        if self.isActive:
+            for button in self.buttons:
+                button.onRelease()
+
+    def updateOnMotion(self, cursor):
+        if self.isActive:
+            for button in self.buttons:
+                button.onMotion(cursor)
