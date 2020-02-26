@@ -23,17 +23,19 @@ class Button(Widget) :
         self.function = f
         self.thm = colorSchem
 
-        self.wdg = self.cv.create_rectangle( self.rect, fill=self.thm[0], outline="")
-        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, text=self.name, fill="#EEEEEE")
-        self.selected = False
+        self.selected = False  # Etat du bouton au commencement
         self.pushed = False
 
-    def onMotion(self, cursor):
+        #### Les id canvas de ce qu'on dessine du bouton ####
+        self.wdg = None
+        self.txt = None
+
+    def onMotion(self, cursor): # coordonnée du curseur
 
         self.selected = self.detect( cursor[0], cursor[1] )
         if not self.pushed:
             if self.selected :
-                self.grow(0)
+                self.grow(5)
                 self.render(self.thm[1])
             else:
                 self.grow(0)
@@ -45,40 +47,37 @@ class Button(Widget) :
     def onPress(self):
         if self.selected :
             self.pushed = True
-            self.grow(5)
+            self.grow(0)
             self.render(self.thm[2])
 
     def onRelease(self):
         if self.selected:
             if self.pushed:
-                self.grow(0)
+                self.grow(5)
                 self.render(self.thm[1])
                 self.function()
             else:
-                self.grow(0)
+                self.grow(5)
                 self.render(self.thm[0])
         else:
             self.grow(0)
             self.render(self.thm[0])
         self.pushed = False
 
-    def delete(self):
+    def destroy(self):
         self.cv.delete(self.wdg)
         self.cv.delete(self.txt)
 
-    def destroy(buttonArray):
-        """Fonction constructeur qui detruit tout les present dans la liste."""
-
-        for b in buttonArray:
-            b.delete()
-        buttonArray = []
-        return buttonArray
 
     def grow(self, v=0):
         self.rect = [self.x-v, self.y-v, self.x+self.w+v, self.y+self.h+v]
 
-    def render(self, color):
-        self.delete()
+    def render(self, color = None):
+        if self.wdg != None and self.txt != None:
+            self.destroy()
+
+        if color == None : # La couleur par defaut
+            color = self.thm[0]
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="", tag="Button")
         self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, text=self.name, fill="#d9d6c6", tag="Button")
@@ -89,9 +88,9 @@ class Button(Widget) :
 
 
 class Menu :
-    def __init__(self, cv, x, y, w, h, thm=["#373533", "#403e3c"] ):
+    def __init__(self, cv, x, y, w, h, thm=["#373533", "#403e3c"], menusToDestroy = [] ):
         self.cv = cv
-        self.isActive = True  # L'état de l'ensemble (visuel + de l'interactivité) des boutons.
+        self.isActive = False  # L'état de l'ensemble (visuel + de l'interactivité) des boutons.
         self.buttons = []  # Liste de tout les boutons du menu
 
         self.x = x
@@ -100,17 +99,29 @@ class Menu :
         self.h = h
 
         self.thm = thm
+        # Liste de menu a detruire lorsqu'on interagit avec ce menu
+        self.menusToDestroy = menusToDestroy
 
     def addButton(self, title="Button", function=lambda : print("Comming soon")):
         self.buttons.append(Button(self.cv, self.x, self.y, self.w, self.h, title, function, self.thm))
         self.y += 100
+
+    def start(self):
+        if not self.isActive:
+            self.isActive = True
+
+            for button in self.buttons:
+                button.render()
+
 
     def updateOnPress(self):
         """The update of a all buttons when left clicking with the mouse"""
         if self.isActive:
             for button in self.buttons:
                 button.onPress()
-
+            if self.menusToDestroy != []:
+                for menu in self.menusToDestroy:
+                    menu.destroy()
     def updateOnRelease(self):
         if self.isActive:
             for button in self.buttons:
@@ -120,3 +131,9 @@ class Menu :
         if self.isActive:
             for button in self.buttons:
                 button.onMotion(cursor)
+
+    def destroy(self):
+        if self.isActive:  # Si on ne l'a pas deja detruit
+            self.isActive = False
+            for button in self.buttons:
+                button.destroy()
