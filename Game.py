@@ -1,6 +1,5 @@
 from random import randrange as rdm
 import Save as IE
-from time import sleep
 import Timer
 
 def disp(M) :
@@ -147,7 +146,7 @@ class Game:
             self.timer.initialTime = data[1]
             self.draw()
         else:
-            print("error")
+            print("Loading error")
 
 
     def select(self, i=None, j=None):
