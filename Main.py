@@ -1,6 +1,6 @@
 from tkinter import Tk, Canvas, PhotoImage
 from UI import Menu
-import Config, Game
+import Config, Game, Timer
 
 
 def motion(event):
@@ -31,8 +31,9 @@ root = Tk()
 cv = Canvas(root, width=width, height=height, bg=menuTheme[-1])
 cv.pack()
 
+timer = Timer.Timer(root, cv, 500, 50)
 
-game = Game.Game(cv,(10, 150), theme)
+game = Game.Game(cv, (10, 150), theme, timer)
 game.start()
 
 #### Creation du Menu principale ####
@@ -49,6 +50,7 @@ mainMenu.addButton( "Save"    , game.save )
 mainMenu.addButton( "Help"  , lambda : print("comming soon") )
 mainMenu.addButton( "Settings", lambda : print("comming soon") )
 mainMenu.addButton( "Quit"    , root.destroy )
+
 mainMenu.start()
 
 

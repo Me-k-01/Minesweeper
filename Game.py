@@ -1,6 +1,7 @@
 from random import randrange as rdm
 import Save as IE
 from time import sleep
+import Timer
 
 def disp(M) :
     for l in M:
@@ -68,7 +69,7 @@ class MineField :
 
 
 class Game:
-    def __init__(self, cv, offset, theme):
+    def __init__(self, cv, offset, theme, time=None):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
         self.bomb = 9# Nombre de bombe
@@ -87,6 +88,8 @@ class Game:
         self.cheat = False  # le cheat est de base inactif
         self.mf = MineField(self.n, self.p, self.bomb)
 
+        if time != None:
+            self.timer = time
 
     def changeDim(self, n, p):
         self.n = n
@@ -129,16 +132,23 @@ class Game:
         self.firstClick = True
         self.mf.placeMine()
         self.draw()
+        if self.timer != None:
+            self.timer.restart()
 
     def save(self):
-        IE.save(self.mf)
+        data = [self.mf, self.timer.initialTime]
+        IE.save(data)
 
     def load(self):
         data = IE.load()
         if data != -1:  # Si on a pas eut d'erreur
-            self.mf = data
+            self.mf = data[0]
             self.firstClick = False
+            self.timer.initialTime = data[1]
             self.draw()
+        else:
+            print("error")
+
 
     def select(self, i=None, j=None):
         self.cv.delete("MF_Selection")

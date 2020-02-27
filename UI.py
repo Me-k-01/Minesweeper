@@ -130,13 +130,14 @@ class Menu :
                     if self.menusToDestroy != []:
                         for menu in self.menusToDestroy:
                             menu.destroy()
+                            
     def updateOnRelease(self):
         if self.isActive:
             for button in self.buttons:
                 pressed = button.onRelease()
                 if pressed and self.destruct:
                     self.destroy()
-                    break
+                    break  # On ne veut pas qu'il continue a inspecter les bouton lorsqu'il s'auto detruit
 
     def updateOnMotion(self, cursor):
         if self.isActive:
