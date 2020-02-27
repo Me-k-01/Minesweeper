@@ -75,8 +75,8 @@ class Game:
 
         #### Dimension ####
         self.xOffset, self.yOffset = offset # coordonnés a partir duquelle on peut dessiner le champ de mine
-        self.width = length, # Longueur du champ de mine
-        self.caseLength = length // self.p  # Taille des blocks
+        self.width = length # Longueur du champ de mine
+        self.caseLength = ( length // self.p ) - 2  # Taille des blocks
         self.caseSpace = 2 # Taille de l'espacement
         self.height = ( self.caseLength + self.caseSpace ) * self.n
 
@@ -107,7 +107,6 @@ class Game:
         d = self.caseSpace + w # Distance de l'espacement
         mid = d//2
 
-        self.width, self.height  = d*self.n, d*self.p  # Taille du champ de mine
         x, y = self.xOffset, self.yOffset
 
 
@@ -222,11 +221,8 @@ class Game:
     def updateOnMotion(self, coords):
         """Update on click"""
         x, y = coords
-        cursorOffset = -10
-        x += cursorOffset
-        y += cursorOffset
 
-        if ( self.xOffset < x < self.xOffset + self.width  and self.yOffset < y < self.yOffset + self.height ):
+        if ( self.xOffset < x < self.xOffset + self.width and self.yOffset < y < self.yOffset + self.height ):
             d = self.caseLength + self.caseSpace  # Distance de l'espacement
             x, y = x-self.xOffset, y-self.yOffset # On commence a 0, 0
             j, i = x // d ,  y // d # On normalise les coordonnés en index
