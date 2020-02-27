@@ -3,7 +3,7 @@ def save(data) :
     from pickle import dump as pDump
 
     try:
-        with open('data.dem', 'wb') as formater:
+        with open('./.data/data.dem', 'wb') as formater:
             pDump(data, formater)
             formater.close()
     except:
@@ -12,7 +12,7 @@ def save(data) :
 def load():
     from pickle import load as pLoad
     try:
-        with open('data.dem', 'rb') as formater:
+        with open('./.data/data.dem', 'rb') as formater:
             data = pLoad(formater)
             formater.close()
         return data

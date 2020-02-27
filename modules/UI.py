@@ -104,11 +104,8 @@ class Menu :
         self.thm = thm
         # Liste de menu a detruire lorsqu'on interagit avec ce menu
         self.menusToDestroy = menusToDestroy
-        self.destruct = False  # Auto destruction
-        if menusToDestroy == []:  # Si on a pas de menu a detruire, c'est que l'on doit s'auto detruire
-            self.destruct = True
-
-
+        self.selfDestruct = False  # Auto destruction
+        
     def addButton(self, title="Button", function=lambda : print("Comming soon")):
         self.buttons.append(Button(self.cv, self.x, self.y, self.w, self.h, title, function, self.thm))
         self.y += 100
@@ -119,6 +116,8 @@ class Menu :
 
             for button in self.buttons:
                 button.render()
+        else:
+            self.destroy()
 
 
     def updateOnPress(self):
@@ -130,12 +129,12 @@ class Menu :
                     if self.menusToDestroy != []:
                         for menu in self.menusToDestroy:
                             menu.destroy()
-                            
+
     def updateOnRelease(self):
         if self.isActive:
             for button in self.buttons:
                 pressed = button.onRelease()
-                if pressed and self.destruct:
+                if pressed and self.selfDestruct:
                     self.destroy()
                     break  # On ne veut pas qu'il continue a inspecter les bouton lorsqu'il s'auto detruit
 

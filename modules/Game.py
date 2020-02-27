@@ -68,16 +68,18 @@ class MineField :
 
 
 class Game:
-    def __init__(self, cv, offset, theme, time=None):
+    def __init__(self, cv, offset, length, theme, time=None):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
         self.bomb = 9# Nombre de bombe
 
+        #### Dimension ####
         self.xOffset, self.yOffset = offset # coordonnés a partir duquelle on peut dessiner le champ de mine
-        self.width, self.height = 0, 0  # Taille du champ de mine
+        self.width = length, # Longueur du champ de mine
+        self.caseLength = length // self.p  # Taille des blocks
+        self.caseSpace = 2 # Taille de l'espacement
+        self.height = ( self.caseLength + self.caseSpace ) * self.n
 
-        self.blockLength = 40 # Taille des blocks
-        self.blockSpace = 2 # Taille en comprenant l'espacement
 
         self.cv = cv
         self.theme = theme
@@ -101,11 +103,11 @@ class Game:
 
     def draw(self):
         """Dessin initial du champ de mine sur le canvas"""
-        w = self.blockLength
-        d = self.blockSpace + w # Distance de l'espacement
+        w = self.caseLength
+        d = self.caseSpace + w # Distance de l'espacement
         mid = d//2
 
-        self.width, self.height  = (d + self.blockSpace)*(self.n-1)  , (d + self.blockSpace)*(self.p-1)  # Taille du champ de mine
+        self.width, self.height  = d*self.n, d*self.p  # Taille du champ de mine
         x, y = self.xOffset, self.yOffset
 
 
@@ -135,15 +137,16 @@ class Game:
             self.timer.restart()
 
     def save(self):
-        data = [self.mf, self.timer.initialTime]
+        data = {"mf": self.mf,
+                "time": self.timer.save()}
         IE.save(data)
 
     def load(self):
         data = IE.load()
         if data != -1:  # Si on a pas eut d'erreur
-            self.mf = data[0]
-            self.firstClick = False
-            self.timer.initialTime = data[1]
+            self.firstClick = False  # On ne modifie pas le champs de mine lors du premier click vu qu'on veut charger un champs de mine
+            self.mf = data["mf"]
+            self.timer.load(data["time"])
             self.draw()
         else:
             print("Loading error")
@@ -160,8 +163,8 @@ class Game:
 
         case = self.mf.m[i][j]
 
-        space = self.blockSpace
-        w = self.blockSpace + self.blockLength
+        space = self.caseSpace
+        w = self.caseSpace + self.caseLength
 
         x = w*j + self.xOffset
         y = w*i + self.yOffset
@@ -223,10 +226,10 @@ class Game:
         x += cursorOffset
         y += cursorOffset
 
-        if ( self.xOffset <= x <= self.xOffset + self.width  and self.yOffset <= y <= self.yOffset + self.height ):
-
+        if ( self.xOffset < x < self.xOffset + self.width  and self.yOffset < y < self.yOffset + self.height ):
+            d = self.caseLength + self.caseSpace  # Distance de l'espacement
             x, y = x-self.xOffset, y-self.yOffset # On commence a 0, 0
-            j, i = x // self.blockLength,  y // self.blockLength # On normalise les coordonnés en index
+            j, i = x // d ,  y // d # On normalise les coordonnés en index
 
             if (i, j) != self.selectionIndex:
                 self.select(i, j)
@@ -249,4 +252,10 @@ class Game:
                     self.reveal([(i, j)])
                 elif case["value"] < 0:
                     self.loose()
+
                 self.draw()
+
+                if case["value"] >= 0:
+                    pass
+                    # Check de combien de case il reste
+                    # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.

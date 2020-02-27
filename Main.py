@@ -1,4 +1,7 @@
 from tkinter import Tk, Canvas, PhotoImage
+import sys
+
+sys.path.append("./modules")
 from UI import Menu
 import Config, Game, Timer
 
@@ -31,9 +34,9 @@ root = Tk()
 cv = Canvas(root, width=width, height=height, bg=menuTheme[-1])
 cv.pack()
 
-timer = Timer.Timer(root, cv, 500, 50)
+timer = Timer.Timer(root, cv, width//2, height//6)
 
-game = Game.Game(cv, (10, 150), theme, timer)
+game = Game.Game(cv, (10, 150), 400, theme, timer)
 game.start()
 
 #### Creation du Menu principale ####
@@ -41,6 +44,8 @@ cv.create_rectangle( width * 3 // 4, 0, width, height, fill=menuTheme[1], outlin
 cv.create_rectangle( 0, 0, width, height//5, fill=menuTheme[0], outline="", tag="UI")
 
 playMenu = Menu(cv, width - 400, height//5 , 200, 100, theme)
+playMenu.selfDestruct = True
+
 playMenu.addButton("New Game", game.start)
 playMenu.addButton("Load"    , game.load)
 
