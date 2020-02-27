@@ -18,16 +18,3 @@ def load():
         return data
     except:
         return -1  # Didn't found the file
-
-
-
-
-
-
-
-
-
-m = [[ 1, 2, 1, 2, 3, 3], [0, 1, 2, 1, 2, 3, 3], [0, 1, 2, 1, 2, 3, 3]]
-save(m)
-
-print(load() )

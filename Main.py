@@ -41,11 +41,11 @@ cv.create_rectangle( 0, 0, width, height//5, fill=menuTheme[0], outline="", tag=
 
 playMenu = Menu(cv, width - 400, height//5 , 200, 100, theme)
 playMenu.addButton("New Game", game.start)
-playMenu.addButton("Load"    , lambda : print("comming soon"))
+playMenu.addButton("Load"    , game.load)
 
 mainMenu = Menu(cv, width - 200, height//5 , 200, 100, theme, [ playMenu ])
 mainMenu.addButton( "Play"    , playMenu.start )
-mainMenu.addButton( "Save"    , lambda : print("comming soon") )
+mainMenu.addButton( "Save"    , game.save )
 mainMenu.addButton( "Help"  , lambda : print("comming soon") )
 mainMenu.addButton( "Settings", lambda : print("comming soon") )
 mainMenu.addButton( "Quit"    , root.destroy )

@@ -1,4 +1,6 @@
 from random import randrange as rdm
+import Save as IE
+from time import sleep
 
 def disp(M) :
     for l in M:
@@ -101,7 +103,7 @@ class Game:
         d = self.blockSpace + w # Distance de l'espacement
         mid = d//2
 
-        self.width, self.height  = d*(self.n-1), d*(self.p-1)  # Taille du champ de mine
+        self.width, self.height  = (d + self.blockSpace)*(self.n-1)  , (d + self.blockSpace)*(self.p-1)  # Taille du champ de mine
         x, y = self.xOffset, self.yOffset
 
 
@@ -116,7 +118,7 @@ class Game:
                         self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MineField")
                     else: # Si c'est une bombe
                         self.cv.create_rectangle(x, y, x+w, y+w,fill="#AA3233", outline="", tag="MineField")
-                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text="*", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+8, fill=self.theme[0],font="Arial 20", text="*", tag="MineField")
                 else:
                     self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
                 x += d
@@ -127,6 +129,16 @@ class Game:
         self.firstClick = True
         self.mf.placeMine()
         self.draw()
+
+    def save(self):
+        IE.save(self.mf)
+
+    def load(self):
+        data = IE.load()
+        if data != -1:  # Si on a pas eut d'erreur
+            self.mf = data
+            self.firstClick = False
+            self.draw()
 
     def select(self, i=None, j=None):
         self.cv.delete("MF_Selection")
@@ -148,9 +160,13 @@ class Game:
 
 
         if ( case["visible"] ): # Si c'est un case revelé
-            if case["value"] >= 0:  # Si c'est pas une bombe
+            if case["value"] < 0:  # Si c'est une bombe
+                self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill="#AA3233", outline="", tag="MF_Selection")
+                self.cv.create_text(x+w//2, y+ w//2 +8, fill=self.theme[0],font="Arial 20", text="*", tag="MF_Selection")
+            else:
                 self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill="#AAAAAA", outline="", tag="MF_Selection")
-                self.cv.create_text(x+w//2, y+w//2+5, fill=self.theme[0],font="Arial 20", text=self.mf.m[i][j]["value"], tag="MineField")
+                self.cv.create_text(x+w//2, y+ w//2 +5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MF_Selection")
+
         else:  # Quand la case n'a pas deja ete revelé
             self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme[2], outline="", tag="MF_Selection")
 
@@ -198,7 +214,7 @@ class Game:
         x += cursorOffset
         y += cursorOffset
 
-        if ( self.xOffset <= x < self.xOffset + self.width and self.yOffset <= y < self.yOffset + self.height ):
+        if ( self.xOffset <= x <= self.xOffset + self.width  and self.yOffset <= y <= self.yOffset + self.height ):
 
             x, y = x-self.xOffset, y-self.yOffset # On commence a 0, 0
             j, i = x // self.blockLength,  y // self.blockLength # On normalise les coordonnés en index
