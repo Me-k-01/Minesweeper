@@ -49,6 +49,7 @@ class Button(Widget) :
             self.pushed = True
             self.grow(0)
             self.render(self.thm[2])
+        return self.selected
 
     def onRelease(self):
         if self.selected:
@@ -63,6 +64,8 @@ class Button(Widget) :
             self.grow(0)
             self.render(self.thm[0])
         self.pushed = False
+
+        return self.selected
 
     def destroy(self):
         self.cv.delete(self.wdg)
@@ -101,6 +104,10 @@ class Menu :
         self.thm = thm
         # Liste de menu a detruire lorsqu'on interagit avec ce menu
         self.menusToDestroy = menusToDestroy
+        self.destruct = False  # Auto destruction
+        if menusToDestroy == []:  # Si on a pas de menu a detruire, c'est que l'on doit s'auto detruire
+            self.destruct = True
+
 
     def addButton(self, title="Button", function=lambda : print("Comming soon")):
         self.buttons.append(Button(self.cv, self.x, self.y, self.w, self.h, title, function, self.thm))
@@ -118,14 +125,18 @@ class Menu :
         """The update of a all buttons when left clicking with the mouse"""
         if self.isActive:
             for button in self.buttons:
-                button.onPress()
-            if self.menusToDestroy != []:
-                for menu in self.menusToDestroy:
-                    menu.destroy()
+                pressed = button.onPress()
+                if pressed:
+                    if self.menusToDestroy != []:
+                        for menu in self.menusToDestroy:
+                            menu.destroy()
     def updateOnRelease(self):
         if self.isActive:
             for button in self.buttons:
-                button.onRelease()
+                pressed = button.onRelease()
+                if pressed and self.destruct:
+                    self.destroy()
+                    break
 
     def updateOnMotion(self, cursor):
         if self.isActive:

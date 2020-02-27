@@ -18,9 +18,9 @@ class MineField :
         self.p = p
         self.nMine = nMine
 
-    def placeMine(self) :
+    def placeMine(self, i=None, j=None) :
         n, p = self.n, self.p
-
+        mineToPlace = self.nMine
         def blankMatrice(n, p):
             matrice = []
             for i in range(n):
@@ -42,22 +42,36 @@ class MineField :
 
         self.m = blankMatrice(self.n, self.p)
 
-        while self.nMine > 0:
+        while mineToPlace > 0:
             x, y = rdm(self.n), rdm(self.p)
-            if self.m[y][x]["value"] >= 0:
-                self.m[y][x]["value"] = -1
-                self.nMine -= 1
-                self.m = addToAdj(self.m, x, y)
 
-        disp(self.m)
+            if i == None:
+                i = -1
+                j = -1
+
+
+            if not ( ( y-1 <= i <= y+1) and ( x-1 <= j <= x+1) ):  # Quand la bombe est assez loin du curseur
+                case = self.m[y][x]
+                if case["value"] >= 0:
+                    case["value"] = -1
+                    self.m = addToAdj(self.m, x, y)
+
+                    mineToPlace -= 1
+        #disp(self.m)
+
+
+
+
+
+
 
 class Game:
-    def __init__(self, cv, theme):
+    def __init__(self, cv, offset, theme):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
-        self.bomb = 3# Nombre de bombe
+        self.bomb = 9# Nombre de bombe
 
-        self.xOffset, self.yOffset = 0, 0  # coordonnés a partir duquelle on peut dessiner le champ de mine
+        self.xOffset, self.yOffset = offset # coordonnés a partir duquelle on peut dessiner le champ de mine
         self.width, self.height = 0, 0  # Taille du champ de mine
 
         self.blockLength = 40 # Taille des blocks
@@ -66,7 +80,8 @@ class Game:
         self.cv = cv
         self.theme = theme
 
-        self.selectionIndex = (0, 0)
+        self.firstClick = True
+        self.selectionIndex = None
         self.cheat = False  # le cheat est de base inactif
         self.mf = MineField(self.n, self.p, self.bomb)
 
@@ -74,51 +89,51 @@ class Game:
     def changeDim(self, n, p):
         self.n = n
         self.p = p
-        self.draw()
+        self.start()
 
     def destroy(self):
         self.cv.delete("MineField")
         self.cv.delete("MF_Selection")
 
-    def draw(self, offset=None):
+    def draw(self):
         """Dessin initial du champ de mine sur le canvas"""
         w = self.blockLength
         d = self.blockSpace + w # Distance de l'espacement
         mid = d//2
 
-        # On commence a une certaine distance du bord de l'ecran.
-        if offset == None:
-            offset = ( self.xOffset, self.yOffset )
-        else:
-            ( self.xOffset, self.yOffset ) = offset
-
         self.width, self.height  = d*(self.n-1), d*(self.p-1)  # Taille du champ de mine
-        x, y = offset
+        x, y = self.xOffset, self.yOffset
 
 
         self.destroy()  # On supprime le precedant champ de mine du canvas
 
         for i in range(self.n):
             for j in range(self.p):
-                if not self.mf.m[i][j]["visible"]:
-                    self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
+                case = self.mf.m[i][j]
+                if case["visible"]:
+                    if case["value"] >= 0:
+                        self.cv.create_rectangle(x, y, x+w, y+w,fill="#AAAAAA", outline="", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MineField")
+                    else: # Si c'est une bombe
+                        self.cv.create_rectangle(x, y, x+w, y+w,fill="#AA3233", outline="", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text="*", tag="MineField")
                 else:
-                    self.cv.create_rectangle(x, y, x+w, y+w,fill="#AAAAAA", outline="", tag="MineField")
-                    self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text=self.mf.m[i][j]["value"], tag="MineField")
-
+                    self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
                 x += d
             x = self.xOffset
             y += d
 
-    def start(self, startAt):
+    def start(self):
+        self.firstClick = True
         self.mf.placeMine()
-        self.draw(startAt)
+        self.draw()
 
     def select(self, i=None, j=None):
         self.cv.delete("MF_Selection")
 
         if i == None:
-            i, j = self.selectionIndex
+            self.selectionIndex = None
+            return
         else:
             self.selectionIndex = (i, j)
 
@@ -132,37 +147,19 @@ class Game:
 
 
 
-        if ( case["visible"] ): # Révélé
-            self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill="#AAAAAA", outline="", tag="MF_Selection")
-            self.cv.create_text(x+w//2, y+w//2+5, fill=self.theme[0],font="Arial 20", text=self.mf.m[i][j]["value"], tag="MineField")
+        if ( case["visible"] ): # Si c'est un case revelé
+            if case["value"] >= 0:  # Si c'est pas une bombe
+                self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill="#AAAAAA", outline="", tag="MF_Selection")
+                self.cv.create_text(x+w//2, y+w//2+5, fill=self.theme[0],font="Arial 20", text=self.mf.m[i][j]["value"], tag="MineField")
         else:  # Quand la case n'a pas deja ete revelé
             self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme[2], outline="", tag="MF_Selection")
 
-
-    def updateOnMotion(self, coords):
-        """Update on click"""
-        x, y = coords
-        cursorOffset = -12
-        x += cursorOffset
-        y += cursorOffset
-
-        if ( self.xOffset < x < self.xOffset + self.width and self.yOffset < y < self.yOffset + self.height ):
-
-            x, y = x-self.xOffset, y-self.yOffset # On commence a 0, 0
-            j, i = x // self.blockLength,  y // self.blockLength # On normalise les coordonnés en index
-
-
-            self.select(i, j)
-        print(self.selectionIndex)
-
     def reveal(self, list):
         """Affichage de toute les case au alentour lorsque l'on tombe sur une valeur de zero"""
-        # TODO: affichage de toute les case au alentour
 
         container = [-1, 0, 1]
         cases = []
 
-        print(list)
         for indexCouple in list:
             i, j = indexCouple
             for k in container:
@@ -180,22 +177,51 @@ class Game:
 
 
         self.draw()
+
         if cases != []:
             self.reveal(cases)
 
+    def loose(self):
+        """Lorsque l'on perd"""
+        for i in range(self.n):
+            for j in range(self.p):
+                case = self.mf.m[i][j]
+                if case["value"] < 0:
+                    case["visible"] = True
+        self.draw()
+
+
+    def updateOnMotion(self, coords):
+        """Update on click"""
+        x, y = coords
+        cursorOffset = -10
+        x += cursorOffset
+        y += cursorOffset
+
+        if ( self.xOffset <= x < self.xOffset + self.width and self.yOffset <= y < self.yOffset + self.height ):
+
+            x, y = x-self.xOffset, y-self.yOffset # On commence a 0, 0
+            j, i = x // self.blockLength,  y // self.blockLength # On normalise les coordonnés en index
+
+            if (i, j) != self.selectionIndex:
+                self.select(i, j)
+        else:
+            self.select()
+
     def onClick(self):
+        if self.selectionIndex != None:  # Si on a une selection
+            i, j = self.selectionIndex
 
-        i, j = self.selectionIndex
-        case = self.mf.m[i][j]
+            if self.firstClick: # Si c'est ble premier clique,
+                self.firstClick = False
+                self.mf.placeMine(i, j)  # On place les mine en fonction de l'emplacement du clique
 
-        if not case["visible"]:  # Si on avait pas deja clické sur cette case
-            case["visible"] = True
-            if case["value"] == 0:
-                self.reveal([(i, j)])
-            elif case["value"] < 0:
-                # TODO: On perd
-                pass
-            self.draw()
+            case = self.mf.m[i][j]
 
-    def onRelease(self):
-        pass
+            if not case["visible"]:  # Si on avait pas deja clické sur cette case
+                case["visible"] = True
+                if case["value"] == 0:
+                    self.reveal([(i, j)])
+                elif case["value"] < 0:
+                    self.loose()
+                self.draw()
