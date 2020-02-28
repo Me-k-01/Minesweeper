@@ -2,16 +2,15 @@ from random import randrange as rdm
 import Save as IE
 import Timer
 
-def disp(M) :
-    for l in M:
-        for d in l:
-            x = d["value"]
-            spacing = ""
-            if ( x >= 0 ):
-                spacing = " "
-            print(spacing, x, end="")
-
-        print()
+#def disp(M) :
+#    for l in M:
+#        for d in l:
+#            x = d["value"]
+#            spacing = ""
+#            if ( x >= 0 ):
+#                spacing = " "
+#            print(spacing, x, end="")
+#        print()
 
 
 class MineField :
@@ -142,16 +141,16 @@ class Game:
         if self.timer != None:
             self.timer.restart()
 
-    def makeNotif(self, txt, color="Default"):
+    def mkNotif(self, txt, color="Default"):
+        """Faire des notifications sur le canvas."""
         if color == "Default":
             color = self.theme[2]
 
         w = self.cv.winfo_width()
         t = 2000
-        notifIdBlock = self.cv.create_rectangle(0, w-25, self.width, w, fill=color, outline="", tag="Notification")
-        notifIdTxt = self.cv.create_text(self.width//2, w-10, fill=self.theme[0],font="Arial 20", text=txt, tag="Notification")
-        self.root.after(t, lambda: self.cv.delete(notifIdBlock))
-        self.root.after(t, lambda: self.cv.delete(notifIdTxt))
+        idBlock = self.cv.create_rectangle(0, w-25, self.width, w, fill=color, outline="", tag="Notification")
+        idTxt = self.cv.create_text(self.width//2, w-10, fill=self.theme[0],font="Arial 20", text=txt, tag="Notification")
+        self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):
         data = {"mf": self.mf,
@@ -160,9 +159,9 @@ class Game:
         result = IE.save(data)
 
         if result == -1:
-            self.makeNotif("An error occured while saving.", "#AA3233")
+            self.mkNotif("An error occured while saving.", "#AA3233")
         else:
-            self.makeNotif("Progress Saved.")
+            self.mkNotif("Progress Saved.")
 
     def load(self):
         data = IE.load()
@@ -172,10 +171,9 @@ class Game:
             self.timer.load(data["time"])
             self.score, self.scoreMax = data["score"]
             self.draw()
-            self.makeNotif("Progress has been loaded")
+            self.mkNotif("Progress has been loaded")
         else:
-            self.makeNotif("Loading error: Couldn't access data.dem", "#AA3233")
-            print("Loading error: Couldn't access data.dem")
+            self.mkNotif("Loading error: Couldn't access data.dem", "#AA3233")
 
 
     def select(self, i=None, j=None):

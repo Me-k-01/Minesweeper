@@ -1,5 +1,5 @@
 from tkinter import Tk, Canvas, PhotoImage
-import sys
+import sys, webbrowser
 
 sys.path.append("./modules")
 from UI import Menu
@@ -26,8 +26,8 @@ def mouseRelease(event):
 
 #### Variables ####
 width, height = 700, 700  # Taille de la fenetre
-theme = Config.mainTheme["default"]
-menuTheme = Config.bgTheme["night"]
+theme = Config.mainTheme["green"]
+menuTheme = Config.bgTheme["day"]
 
 #### Set up de la fenetre Tkinter ####
 root = Tk()
@@ -50,8 +50,8 @@ playMenu.addButton("Load"    , game.load)
 mainMenu = Menu(cv, width - 200, height//5 , 200, 100, theme, [ playMenu ])
 mainMenu.addButton( "Play"    , playMenu.start )
 mainMenu.addButton( "Save"    , game.save )
-mainMenu.addButton( "Get  Help"  , lambda : print("comming soon") )
-mainMenu.addButton( "Settings", lambda : print("comming soon") )
+mainMenu.addButton( "Get  Help"  , lambda : webbrowser.open('https://github.com/Me-k-01/Projet_Python') )
+mainMenu.addButton( "Settings", lambda : print("Comming Soon") )
 mainMenu.addButton( "Quit"    , root.destroy )
 
 mainMenu.start()
