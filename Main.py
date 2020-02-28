@@ -3,7 +3,7 @@ import sys
 
 sys.path.append("./modules")
 from UI import Menu
-import Config, Game, Timer
+import Config, Game
 
 
 def motion(event):
@@ -31,17 +31,15 @@ menuTheme = Config.bgTheme["night"]
 
 #### Set up de la fenetre Tkinter ####
 root = Tk()
-cv = Canvas(root, width=width, height=height, bg=menuTheme[-1])
+cv = Canvas(root, width=width, height=height, bg=menuTheme[2])
 cv.pack()
-
-timer = Timer.Timer(root, cv, width//2, height//6)
-
-game = Game.Game(root, cv, (10, 150), 400, theme, timer)
-game.start()
 
 #### Creation du Menu principale ####
 cv.create_rectangle( width * 3 // 4, 0, width, height, fill=menuTheme[1], outline="", tag="UI")
 cv.create_rectangle( 0, 0, width, height//5, fill=menuTheme[0], outline="", tag="UI")
+
+game = Game.Game(root, cv, (10, 150), 400, theme)
+game.start()
 
 playMenu = Menu(cv, width - 400, height//5 , 200, 100, theme)
 playMenu.selfDestruct = True

@@ -2,7 +2,7 @@ from time import time
 from datetime import timedelta as timeFormater
 
 class Timer:
-    def __init__(self, root, cv, x, y, ):
+    def __init__(self, root, cv, x, y):
         self.root = root
         self.cv = cv
 
@@ -14,7 +14,7 @@ class Timer:
         self.timeWhenLoading = None
 
 
-        self.wdg = None
+        self.id = None
         self.updating()
 
     def save(self):
@@ -29,11 +29,11 @@ class Timer:
     def updating(self):
         t = int(time() - self.initialTime)
 
-        if self.wdg != None:
-            self.cv.delete(self.wdg)
-            
+        if self.id != None:
+            self.cv.delete(self.id)
+
         txt = timeFormater(seconds=t)
-        self.wdg = self.cv.create_text(self.x, self.y, fill="#AAAAAA",font="Arial 20", text=txt)
+        self.id = self.cv.create_text(self.x, self.y, fill="#AAAAAA",font="Arial 22", text=txt)
         self.root.after(200, self.updating)
 
     def restart(self):

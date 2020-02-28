@@ -6,6 +6,7 @@ def save(data) :
         with open('./.data/data.dem', 'wb') as formater:
             pDump(data, formater)
             formater.close()
+        return 0
     except:
         return -1 # Access error
 

@@ -83,7 +83,7 @@ class Button(Widget) :
             color = self.thm[0]
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="", tag="Button")
-        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2,font="7", text=self.name, fill="#AAAAAA", tag="Button")
+        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, font="Arial 12", text=self.name, fill="#AAAAAA", tag="Button")
 
 
 

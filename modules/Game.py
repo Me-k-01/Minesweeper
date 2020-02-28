@@ -66,9 +66,8 @@ class MineField :
 
 
 
-
 class Game:
-    def __init__(self, root, cv, offset, length, theme, time=None):
+    def __init__(self, root, cv, offset, length, theme):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
         self.bomb = 9# Nombre de bombe
@@ -79,6 +78,7 @@ class Game:
         self.caseLength = ( length // self.p ) - 2  # Taille des blocks
         self.caseSpace = 2 # Taille de l'espacement
         self.height = ( self.caseLength + self.caseSpace ) * self.n
+        self.yAlign = self.yOffset //2
 
         ####  Score   ####
         self.score = 0
@@ -90,11 +90,10 @@ class Game:
 
         self.firstClick = True
         self.selectionIndex = None
-        self.cheat = False  # le cheat est de base inactif
-        self.mf = MineField(self.n, self.p, self.bomb)
+        self.cheat = False  # Le cheat est de base inactif
 
-        if time != None:
-            self.timer = time
+        self.mf = MineField(self.n, self.p, self.bomb)
+        self.timer = Timer.Timer(root, cv, self.width - 20, self.yAlign)
 
     def changeDim(self, n, p):
         self.n = n
@@ -116,7 +115,7 @@ class Game:
         self.destroy()  # On supprime le precedant champ de mine du canvas
 
         score = str(self.score) + " / " + str(self.scoreMax)
-        self.cv.create_text(500, 50, fill="#AAAAAA",font="Arial 20", text=score, tag="Score")
+        self.cv.create_text(self.width // 3, self.yAlign, fill=self.theme[2], font="Arial 22", text=score, tag="Score")
 
         for i in range(self.n):
             for j in range(self.p):
@@ -124,11 +123,10 @@ class Game:
                 if case["visible"]:
                     if case["value"] >= 0:
                         self.cv.create_rectangle(x, y, x+w, y+w,fill="#AAAAAA", outline="", tag="MineField")
-                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0], font="Arial 20", text=case["value"], tag="MineField")
                     else: # Si c'est une bombe
-
                         self.cv.create_rectangle(x, y, x+w, y+w,fill="#AA3233", outline="", tag="MineField")
-                        self.cv.create_text(x+mid, y+mid+8, fill=self.theme[0],font="Arial 20", text="*", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+8, fill=self.theme[0], font="Arial 20", text="*", tag="MineField")
                 else:
                     self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
                 x += d
@@ -144,11 +142,27 @@ class Game:
         if self.timer != None:
             self.timer.restart()
 
+    def makeNotif(self, txt, color="Default"):
+        if color == "Default":
+            color = self.theme[2]
+
+        w = self.cv.winfo_width()
+        t = 2000
+        notifIdBlock = self.cv.create_rectangle(0, w-25, self.width, w, fill=color, outline="", tag="Notification")
+        notifIdTxt = self.cv.create_text(self.width//2, w-10, fill=self.theme[0],font="Arial 20", text=txt, tag="Notification")
+        self.root.after(t, lambda: self.cv.delete(notifIdBlock))
+        self.root.after(t, lambda: self.cv.delete(notifIdTxt))
+
     def save(self):
         data = {"mf": self.mf,
                 "time": self.timer.save(),
                 "score": [self.score, self.scoreMax]}
-        IE.save(data)
+        result = IE.save(data)
+
+        if result == -1:
+            self.makeNotif("An error occured while saving.", "#AA3233")
+        else:
+            self.makeNotif("Progress Saved.")
 
     def load(self):
         data = IE.load()
@@ -158,7 +172,9 @@ class Game:
             self.timer.load(data["time"])
             self.score, self.scoreMax = data["score"]
             self.draw()
+            self.makeNotif("Progress has been loaded")
         else:
+            self.makeNotif("Loading error: Couldn't access data.dem", "#AA3233")
             print("Loading error: Couldn't access data.dem")
 
 
