@@ -148,8 +148,8 @@ class Game:
 
         w = self.cv.winfo_width()
         t = 2000
-        idBlock = self.cv.create_rectangle(0, w-25, self.width, w, fill=color, outline="", tag="Notification")
-        idTxt = self.cv.create_text(self.width//2, w-10, fill=self.theme[0],font="Arial 20", text=txt, tag="Notification")
+        idBlock = self.cv.create_rectangle(0, w-25, w , w, fill=color, outline="", tag="Notification")
+        idTxt = self.cv.create_text(w//2, w-10, fill=self.theme[0],font="Arial 17", text=txt, tag="Notification")
         self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):

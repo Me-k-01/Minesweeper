@@ -26,8 +26,8 @@ def mouseRelease(event):
 
 #### Variables ####
 width, height = 700, 700  # Taille de la fenetre
-theme = Config.mainTheme["green"]
-menuTheme = Config.bgTheme["day"]
+theme = Config.mainTheme["default"]
+menuTheme = Config.bgTheme["night"]
 
 #### Set up de la fenetre Tkinter ####
 root = Tk()
