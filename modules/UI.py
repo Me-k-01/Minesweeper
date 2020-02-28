@@ -83,7 +83,7 @@ class Button(Widget) :
             color = self.thm[0]
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="", tag="Button")
-        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, text=self.name, fill="#d9d6c6", tag="Button")
+        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2,font="7", text=self.name, fill="#AAAAAA", tag="Button")
 
 
 
@@ -105,7 +105,7 @@ class Menu :
         # Liste de menu a detruire lorsqu'on interagit avec ce menu
         self.menusToDestroy = menusToDestroy
         self.selfDestruct = False  # Auto destruction
-        
+
     def addButton(self, title="Button", function=lambda : print("Comming soon")):
         self.buttons.append(Button(self.cv, self.x, self.y, self.w, self.h, title, function, self.thm))
         self.y += 100

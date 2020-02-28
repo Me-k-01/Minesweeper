@@ -68,7 +68,7 @@ class MineField :
 
 
 class Game:
-    def __init__(self, cv, offset, length, theme, time=None):
+    def __init__(self, root, cv, offset, length, theme, time=None):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
         self.bomb = 9# Nombre de bombe
@@ -80,7 +80,11 @@ class Game:
         self.caseSpace = 2 # Taille de l'espacement
         self.height = ( self.caseLength + self.caseSpace ) * self.n
 
+        ####  Score   ####
+        self.score = 0
+        self.scoreMax = (( self.n * self.p ) - self.bomb) * 100
 
+        self.root = root
         self.cv = cv
         self.theme = theme
 
@@ -100,6 +104,7 @@ class Game:
     def destroy(self):
         self.cv.delete("MineField")
         self.cv.delete("MF_Selection")
+        self.cv.delete("Score")
 
     def draw(self):
         """Dessin initial du champ de mine sur le canvas"""
@@ -108,9 +113,10 @@ class Game:
         mid = d//2
 
         x, y = self.xOffset, self.yOffset
-
-
         self.destroy()  # On supprime le precedant champ de mine du canvas
+
+        score = str(self.score) + " / " + str(self.scoreMax)
+        self.cv.create_text(500, 50, fill="#AAAAAA",font="Arial 20", text=score, tag="Score")
 
         for i in range(self.n):
             for j in range(self.p):
@@ -120,6 +126,7 @@ class Game:
                         self.cv.create_rectangle(x, y, x+w, y+w,fill="#AAAAAA", outline="", tag="MineField")
                         self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MineField")
                     else: # Si c'est une bombe
+
                         self.cv.create_rectangle(x, y, x+w, y+w,fill="#AA3233", outline="", tag="MineField")
                         self.cv.create_text(x+mid, y+mid+8, fill=self.theme[0],font="Arial 20", text="*", tag="MineField")
                 else:
@@ -131,13 +138,16 @@ class Game:
     def start(self):
         self.firstClick = True
         self.mf.placeMine()
+        self.score = 0
+        self.scoreMax = (( self.n * self.p ) - self.bomb) * 100
         self.draw()
         if self.timer != None:
             self.timer.restart()
 
     def save(self):
         data = {"mf": self.mf,
-                "time": self.timer.save()}
+                "time": self.timer.save(),
+                "score": [self.score, self.scoreMax]}
         IE.save(data)
 
     def load(self):
@@ -146,9 +156,10 @@ class Game:
             self.firstClick = False  # On ne modifie pas le champs de mine lors du premier click vu qu'on veut charger un champs de mine
             self.mf = data["mf"]
             self.timer.load(data["time"])
+            self.score, self.scoreMax = data["score"]
             self.draw()
         else:
-            print("Loading error")
+            print("Loading error: Couldn't access data.dem")
 
 
     def select(self, i=None, j=None):
@@ -156,6 +167,8 @@ class Game:
 
         if i == None:
             self.selectionIndex = None
+            if self.cheat:
+                self.root.config(cursor="arrow")
             return
         else:
             self.selectionIndex = (i, j)
@@ -164,11 +177,11 @@ class Game:
 
         space = self.caseSpace
         w = self.caseSpace + self.caseLength
-
         x = w*j + self.xOffset
         y = w*i + self.yOffset
 
-
+        if self.cheat:
+            self.root.config(cursor="arrow")
 
         if ( case["visible"] ): # Si c'est un case revelé
             if case["value"] < 0:  # Si c'est une bombe
@@ -180,6 +193,9 @@ class Game:
 
         else:  # Quand la case n'a pas deja ete revelé
             self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme[2], outline="", tag="MF_Selection")
+            if case["value"] < 0 and self.cheat and not self.firstClick:  # Si l'on est sur une bombe et que l'on triche
+                self.root.config(cursor="circle")
+
 
     def reveal(self, list):
         """Affichage de toute les case au alentour lorsque l'on tombe sur une valeur de zero"""
@@ -194,10 +210,11 @@ class Game:
                     iNext, jNext = i+k, j+h
                     if ( 0 <= iNext < self.n and 0 <= jNext < self.p):  # Si on est dans les limites du bord de l'ecran
                         case = self.mf.m[iNext][jNext]  # La nouvelle case a decouvrir
-
                         if not case["visible"]:  # Si c'est une case qui n'a pas deja ete decouverte
 
                             case["visible"] = True
+                            self.score += 100
+
                             if case["value"] == 0:  # Si c'est encore une case nulle,
                                 # On ajoute une prochaine verification a effectuer.
                                 cases.append((iNext, jNext))
@@ -206,7 +223,7 @@ class Game:
         self.draw()
 
         if cases != []:
-            self.reveal(cases)
+            self.root.after(100, lambda: self.reveal(cases))
 
     def loose(self):
         """Lorsque l'on perd"""
@@ -221,6 +238,7 @@ class Game:
     def updateOnMotion(self, coords):
         """Update on click"""
         x, y = coords
+
 
         if ( self.xOffset < x < self.xOffset + self.width and self.yOffset < y < self.yOffset + self.height ):
             d = self.caseLength + self.caseSpace  # Distance de l'espacement
@@ -244,14 +262,19 @@ class Game:
 
             if not case["visible"]:  # Si on avait pas deja clické sur cette case
                 case["visible"] = True
+
                 if case["value"] == 0:
                     self.reveal([(i, j)])
                 elif case["value"] < 0:
                     self.loose()
+                    print("Loose")
 
-                self.draw()
 
                 if case["value"] >= 0:
-                    pass
+                    self.score += 100
+                    if self.score == self.scoreMax:
+                        print("Win")
                     # Check de combien de case il reste
                     # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.
+
+                self.draw()
