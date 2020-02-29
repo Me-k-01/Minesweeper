@@ -43,14 +43,14 @@ game = Game.Game(root, cv, (10, 150), 400, myTheme)
 game.start()
 
 #### Menu jouer  ####
-playMenu = Menu(cv, width - 400, height//5 , 200, 100, myTheme["Menu"] )
+playMenu = Menu(cv, width - 400, height//5 , 200, 100, myTheme["Scheme"]["button"] )
 playMenu.selfDestruct = True
 
 playMenu.addButton("New  Game", game.start)
 playMenu.addButton("Load"    , game.load)
 
 #### Menu Principale  ####
-mainMenu = Menu(cv, width - 200, height//5 , 200, 100, myTheme["Menu"], [ playMenu ])
+mainMenu = Menu(cv, width - 200, height//5 , 200, 100, myTheme["Scheme"]["button"], [ playMenu ])
 mainMenu.addButton( "Play"    , playMenu.start )
 mainMenu.addButton( "Save"    , game.save )
 mainMenu.addButton( "Help"  , lambda : webbrowser.open('https://github.com/Me-k-01/Projet_Python') )

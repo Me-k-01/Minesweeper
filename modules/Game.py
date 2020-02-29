@@ -87,9 +87,11 @@ class Game:
         self.cv = cv
         self.theme = theme
 
+        self.cheat = False  # Le cheat est de base inactif
+
         self.firstClick = True
         self.selectionIndex = None
-        self.cheat = False  # Le cheat est de base inactif
+        self.revealLoopId = None
 
         self.mf = MineField(self.n, self.p, self.bomb)
         self.timer = Timer.Timer(root, cv, self.width - 20, self.yAlign)
@@ -134,6 +136,8 @@ class Game:
             y += d
 
     def start(self):
+        self.stopReveal()
+
         self.firstClick = True
         self.mf.placeMine()
         self.score = 0
@@ -154,19 +158,24 @@ class Game:
         self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):
-        data = {"mf": self.mf,
-                "time": self.timer.save(),
-                "score": [self.score, self.scoreMax]}
-        result = IE.save(data)
+        if self.revealLoopId == None:  # Si on est pas encore en train de reveler des cases sur le champs
+            data = {"mf": self.mf,
+                    "time": self.timer.save(),
+                    "score": [self.score, self.scoreMax]}
+            result = IE.save(data)
 
-        if result == -1:
-            self.mkNotif("An error occured while saving.", "#AA3233")
+            if result == -1:
+                self.mkNotif("An error occured while saving.", self.theme["Primary"]["warning"])
+            else:
+                self.mkNotif("Progress Saved.")
         else:
-            self.mkNotif("Progress Saved.")
-
+            self.mkNotif("Wait a bit before saving.", self.theme["Primary"]["warning"])
     def load(self):
         data = IE.load()
         if data != -1:  # Si on a pas eut d'erreur
+            # On arrette tout revelation des cases en cours
+            self.stopReveal()
+
             self.firstClick = False  # On ne modifie pas le champs de mine lors du premier click vu qu'on veut charger un champs de mine
             self.mf = data["mf"]
             self.timer.load(data["time"])
@@ -237,8 +246,16 @@ class Game:
 
         self.draw()
 
-        if cases != []:
-            self.root.after(75, lambda: self.reveal(cases))
+        if cases != []:  # S'il reste des cases a reveler
+            self.revealLoopId = self.root.after(45, lambda: self.reveal(cases))
+        else:
+            self.revealLoopId = None
+
+    def stopReveal(self):
+        """Fonction pour arretter la boucle de revelation en cours, si il y en a une"""
+        if self.revealLoopId != None:
+            self.root.after_cancel(self.revealLoopId)
+            self.revealLoopId = None
 
     def loose(self):
         """Lorsque l'on perd"""

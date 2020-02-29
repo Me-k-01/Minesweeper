@@ -91,7 +91,7 @@ class Button(Widget) :
 
 
 class Menu :
-    def __init__(self, cv, x, y, w, h, thm=["#000000", "#444433", "#998755"], menusToDestroy = [] ):
+    def __init__(self, cv, x, y, w, h, thm=["#000000", "#444433", "#998755", "#AAAAAA"], menusToDestroy = [] ):
         self.cv = cv
         self.isActive = False  # L'état de l'ensemble (visuel + de l'interactivité) des boutons.
         self.buttons = []  # Liste de tout les boutons du menu
