@@ -13,7 +13,7 @@ class Timer:
         self.timeWhenSaved = None
         self.timeWhenLoading = None
 
-
+        self.cv.create_rectangle(x-75, y-25, x+75, y+25, fill="#9592b4", outline="", tag="Timer")
         self.id = None
         self.updating()
 
@@ -33,7 +33,7 @@ class Timer:
             self.cv.delete(self.id)
 
         txt = timeFormater(seconds=t)
-        self.id = self.cv.create_text(self.x, self.y, fill="#AAAAAA",font="Arial 22", text=txt)
+        self.id = self.cv.create_text(self.x, self.y, fill="#141417",font="Arial 22", text=txt, tag="Timer")
         self.root.after(200, self.updating)
 
     def restart(self):

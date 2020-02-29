@@ -16,7 +16,7 @@ class Widget :
 
 class Button(Widget) :
     """Boutton de sous-widget canvas"""
-    def __init__(self, canvas, x, y, w, h, name="Button", f=lambda : print("Comming soon"), colorSchem=["#000000", "#444433", "#998755"]):
+    def __init__(self, canvas, x, y, w, h, name="Button", f=lambda : print("Comming soon"), colorSchem=["#000000", "#444433", "#998755", "#AAAAAA"]):
         super().__init__(x, y, w, h)
         self.cv = canvas
         self.name = name
@@ -83,7 +83,7 @@ class Button(Widget) :
             color = self.thm[0]
 
         self.wdg = self.cv.create_rectangle( self.rect, fill=color, outline="", tag="Button")
-        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, font="Arial 12", text=self.name, fill="#AAAAAA", tag="Button")
+        self.txt = self.cv.create_text( self.x + self.w//2, self.y + self.h//2, font="Arial 12", text=self.name, fill=self.thm[3], tag="Button")
 
 
 
@@ -91,7 +91,7 @@ class Button(Widget) :
 
 
 class Menu :
-    def __init__(self, cv, x, y, w, h, thm=["#373533", "#403e3c"], menusToDestroy = [] ):
+    def __init__(self, cv, x, y, w, h, thm=["#000000", "#444433", "#998755"], menusToDestroy = [] ):
         self.cv = cv
         self.isActive = False  # L'état de l'ensemble (visuel + de l'interactivité) des boutons.
         self.buttons = []  # Liste de tout les boutons du menu

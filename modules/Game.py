@@ -114,20 +114,21 @@ class Game:
         self.destroy()  # On supprime le precedant champ de mine du canvas
 
         score = str(self.score) + " / " + str(self.scoreMax)
-        self.cv.create_text(self.width // 3, self.yAlign, fill=self.theme[2], font="Arial 22", text=score, tag="Score")
+        self.cv.create_text(self.width // 3, self.yAlign, fill=self.theme["Secondary"][1], font="Arial 22", text=score, tag="Score")
 
         for i in range(self.n):
             for j in range(self.p):
                 case = self.mf.m[i][j]
                 if case["visible"]:
-                    if case["value"] >= 0:
-                        self.cv.create_rectangle(x, y, x+w, y+w,fill="#AAAAAA", outline="", tag="MineField")
-                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme[0], font="Arial 20", text=case["value"], tag="MineField")
-                    else: # Si c'est une bombe
-                        self.cv.create_rectangle(x, y, x+w, y+w,fill="#AA3233", outline="", tag="MineField")
-                        self.cv.create_text(x+mid, y+mid+8, fill=self.theme[0], font="Arial 20", text="*", tag="MineField")
-                else:
-                    self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme[0], outline="", tag="MineField")
+                    if case["value"] < 0 :  # Si c'est une bombe
+                        self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["warning"], outline="", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+8, fill=self.theme["Primary"]["font"][1], font="Arial 20", text="*", tag="MineField")
+                    else:
+                        self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][1], outline="", tag="MineField")
+                        self.cv.create_text(x+mid, y+mid+5, fill=self.theme["Primary"]["font"][1], font="Arial 20", text=case["value"], tag="MineField")
+
+                else:  # Si le contenu de la case n'est pas révelé
+                    self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][0], outline="", tag="MineField")
                 x += d
             x = self.xOffset
             y += d
@@ -144,12 +145,12 @@ class Game:
     def mkNotif(self, txt, color="Default"):
         """Faire des notifications sur le canvas."""
         if color == "Default":
-            color = self.theme[2]
+            color = self.theme["Primary"]["notification"]
 
         w = self.cv.winfo_width()
         t = 2000
         idBlock = self.cv.create_rectangle(0, w-25, w , w, fill=color, outline="", tag="Notification")
-        idTxt = self.cv.create_text(w//2, w-10, fill=self.theme[0],font="Arial 17", text=txt, tag="Notification")
+        idTxt = self.cv.create_text(w//2, w-10, fill=self.theme["Primary"]["font"][1],font="Arial 17", text=txt, tag="Notification")
         self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):
@@ -199,14 +200,14 @@ class Game:
 
         if ( case["visible"] ): # Si c'est un case revelé
             if case["value"] < 0:  # Si c'est une bombe
-                self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill="#AA3233", outline="", tag="MF_Selection")
-                self.cv.create_text(x+w//2, y+ w//2 +8, fill=self.theme[0],font="Arial 20", text="*", tag="MF_Selection")
+                self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["warning"], outline="", tag="MF_Selection")
+                self.cv.create_text(x+w//2, y+ w//2 +8, fill=self.theme["Primary"]["font"][1],font="Arial 20", text="*", tag="MF_Selection")
             else:
-                self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill="#AAAAAA", outline="", tag="MF_Selection")
-                self.cv.create_text(x+w//2, y+ w//2 +5, fill=self.theme[0],font="Arial 20", text=case["value"], tag="MF_Selection")
+                self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill=self.theme["Primary"]["game"][1], outline="", tag="MF_Selection")
+                self.cv.create_text(x+w//2, y+ w//2 +5, fill=self.theme["Primary"]["font"][1],font="Arial 20", text=case["value"], tag="MF_Selection")
 
         else:  # Quand la case n'a pas deja ete revelé
-            self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme[2], outline="", tag="MF_Selection")
+            self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["notification"], outline="", tag="MF_Selection")
             if case["value"] < 0 and self.cheat and not self.firstClick:  # Si l'on est sur une bombe et que l'on triche
                 self.root.config(cursor="circle")
 
@@ -237,7 +238,7 @@ class Game:
         self.draw()
 
         if cases != []:
-            self.root.after(100, lambda: self.reveal(cases))
+            self.root.after(75, lambda: self.reveal(cases))
 
     def loose(self):
         """Lorsque l'on perd"""
@@ -264,7 +265,7 @@ class Game:
         else:
             self.select()
 
-    def onClick(self):
+    def updateOnPress(self):
         if self.selectionIndex != None:  # Si on a une selection
             i, j = self.selectionIndex
 
