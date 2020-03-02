@@ -1,5 +1,5 @@
 from random import randrange as rdm
-from time import sleep
+#$ from time import sleep
 import Timer
 import Save as IE
 
@@ -301,10 +301,10 @@ class Game:
                     self.inLoop = True
                     #self.reveal([(i, j)])
                     while cases != [] and self.inLoop:
-                        sleep(0.45)
-                        self.cv.update()
                         cases = self.reveal(cases)
                         self.draw()
+                        #$ self.cv.update()
+                        #$ sleep(0.45)
                     self.inLoop = False
                 elif case["value"] < 0:
                     self.loose()
