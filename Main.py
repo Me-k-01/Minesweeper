@@ -18,6 +18,7 @@ def mousePress(event):
     game.updateOnPress()
     playMenu.updateOnPress()
     mainMenu.updateOnPress()
+    cv.update()
 
 def mouseRelease(event):
     """Runs everytime the left click of the mouse is released."""

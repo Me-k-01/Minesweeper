@@ -1,6 +1,7 @@
 from random import randrange as rdm
-import Save as IE
+from time import sleep
 import Timer
+import Save as IE
 
 #def disp(M) :
 #    for l in M:
@@ -91,7 +92,8 @@ class Game:
 
         self.firstClick = True
         self.selectionIndex = None
-        self.revealLoopId = None
+        #self.revealLoopId = None
+        self.inLoop = False
 
         self.mf = MineField(self.n, self.p, self.bomb)
         self.timer = Timer.Timer(root, cv, self.width - 20, self.yAlign)
@@ -134,7 +136,6 @@ class Game:
                 x += d
             x = self.xOffset
             y += d
-
     def start(self):
         self.stopReveal()
 
@@ -158,7 +159,7 @@ class Game:
         self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):
-        if self.revealLoopId == None:  # Si on est pas encore en train de reveler des cases sur le champs
+        if not self.inLoop:  # Si on est pas encore en train de reveler des cases sur le champs
             data = {"mf": self.mf,
                     "time": self.timer.save(),
                     "score": [self.score, self.scoreMax]}
@@ -227,15 +228,15 @@ class Game:
         container = [-1, 0, 1]
         cases = []
 
-        for indexCouple in list:
+        for indexCouple in list:  # Pour chaque index de case
             i, j = indexCouple
+            #### Toutes les cases adjacentes  ####
             for k in container:
                 for h in container:
                     iNext, jNext = i+k, j+h
                     if ( 0 <= iNext < self.n and 0 <= jNext < self.p):  # Si on est dans les limites du bord de l'ecran
                         case = self.mf.m[iNext][jNext]  # La nouvelle case a decouvrir
                         if not case["visible"]:  # Si c'est une case qui n'a pas deja ete decouverte
-
                             case["visible"] = True
                             self.score += 100
 
@@ -243,19 +244,19 @@ class Game:
                                 # On ajoute une prochaine verification a effectuer.
                                 cases.append((iNext, jNext))
 
-
-        self.draw()
-
-        if cases != []:  # S'il reste des cases a reveler
-            self.revealLoopId = self.root.after(45, lambda: self.reveal(cases))
-        else:
-            self.revealLoopId = None
+        return cases
+        #self.draw()
+        #if cases != []:  # S'il reste des cases a reveler
+        #    self.revealLoopId = self.root.after(45, lambda: self.reveal(cases))
+        #else:
+        #    self.revealLoopId = None
 
     def stopReveal(self):
-        """Fonction pour arretter la boucle de revelation en cours, si il y en a une"""
-        if self.revealLoopId != None:
-            self.root.after_cancel(self.revealLoopId)
-            self.revealLoopId = None
+        self.inLoop = False
+    #    """Fonction pour arretter la boucle de revelation en cours, si il y en a une"""
+    #    if self.revealLoopId != None:
+    #        self.root.after_cancel(self.revealLoopId)
+    #        self.revealLoopId = None
 
     def loose(self):
         """Lorsque l'on perd"""
@@ -296,7 +297,15 @@ class Game:
                 case["visible"] = True
 
                 if case["value"] == 0:
-                    self.reveal([(i, j)])
+                    cases = [(i, j)]
+                    self.inLoop = True
+                    #self.reveal([(i, j)])
+                    while cases != [] and self.inLoop:
+                        sleep(0.45)
+                        self.cv.update()
+                        cases = self.reveal(cases)
+                        self.draw()
+                    self.inLoop = False
                 elif case["value"] < 0:
                     self.loose()
                     print("Loose")
