@@ -82,7 +82,8 @@ class Game:
 
         ####  Score   ####
         self.score = 0
-        self.scoreMax = (( self.n * self.p ) - self.bomb) * 100
+        self.step = 1
+        self.scoreMax = (( self.n * self.p ) - self.bomb) * self.step
 
         self.root = root
         self.cv = cv
@@ -142,7 +143,7 @@ class Game:
         self.firstClick = True
         self.mf.placeMine()
         self.score = 0
-        self.scoreMax = (( self.n * self.p ) - self.bomb) * 100
+        self.scoreMax = (( self.n * self.p ) - self.bomb) * self.step
         self.draw()
         if self.timer != None:
             self.timer.restart()
@@ -238,7 +239,7 @@ class Game:
                         case = self.mf.m[iNext][jNext]  # La nouvelle case a decouvrir
                         if not case["visible"]:  # Si c'est une case qui n'a pas deja ete decouverte
                             case["visible"] = True
-                            self.score += 100
+                            self.score += self.step
 
                             if case["value"] == 0:  # Si c'est encore une case nulle,
                                 # On ajoute une prochaine verification a effectuer.
@@ -312,7 +313,7 @@ class Game:
 
 
                 if case["value"] >= 0:
-                    self.score += 100
+                    self.score += self.step
                     if self.score == self.scoreMax:
                         print("Win")
                     # Check de combien de case il reste

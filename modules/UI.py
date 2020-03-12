@@ -148,3 +148,9 @@ class Menu :
             self.isActive = False
             for button in self.buttons:
                 button.destroy()
+
+    def switch(self):
+        if self.isActive:
+            self.destroy()
+        else:
+            self.start()
