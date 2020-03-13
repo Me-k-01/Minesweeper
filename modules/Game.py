@@ -126,9 +126,11 @@ class Game:
                     if case["value"] < 0 :  # Si c'est une bombe
                         self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["warning"], outline="", tag="MineField")
                         self.cv.create_text(x+mid, y+mid+8, fill=self.theme["Primary"]["font"][1], font="Arial 20", text="*", tag="MineField")
-                    else:
+                    elif case["value"] > 0:
                         self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][1], outline="", tag="MineField")
                         self.cv.create_text(x+mid, y+mid+5, fill=self.theme["Primary"]["font"][1], font="Arial 20", text=case["value"], tag="MineField")
+                    else:
+                        self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][1], outline="", tag="MineField")
 
                 else:  # Si le contenu de la case n'est pas révelé
                     self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][0], outline="", tag="MineField")
@@ -212,9 +214,11 @@ class Game:
             if case["value"] < 0:  # Si c'est une bombe
                 self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["warning"], outline="", tag="MF_Selection")
                 self.cv.create_text(x+w//2, y+ w//2 +8, fill=self.theme["Primary"]["font"][1],font="Arial 20", text="*", tag="MF_Selection")
-            else:
+            elif case["value"] > 0:
                 self.cv.create_rectangle(x-space, y-space, x+w, y+w, fill=self.theme["Primary"]["game"][1], outline="", tag="MF_Selection")
                 self.cv.create_text(x+w//2, y+ w//2 +5, fill=self.theme["Primary"]["font"][1],font="Arial 20", text=case["value"], tag="MF_Selection")
+            else:
+                self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["game"][1], outline="", tag="MF_Selection")
 
         else:  # Quand la case n'a pas deja ete revelé
             self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["notification"], outline="", tag="MF_Selection")
@@ -283,31 +287,36 @@ class Game:
         else:
             self.select()
 
-    def updateOnPress(self):
+    def updateOnPress(self, state ="right"):
+
         if self.selectionIndex != None:  # Si on a une selection
             i, j = self.selectionIndex
 
-            if self.firstClick: # Si c'est ble premier clique,
-                self.firstClick = False
-                self.mf.placeMine(i, j)  # On place les mine en fonction de l'emplacement du clique
+            if state == "right":
 
-            case = self.mf.m[i][j]
+                if self.firstClick: # Si c'est ble premier clique,
+                    self.firstClick = False
+                    self.mf.placeMine(i, j)  # On place les mine en fonction de l'emplacement du clique
 
-            if not case["visible"]:  # Si on avait pas deja clické sur cette case
-                case["visible"] = True
+                case = self.mf.m[i][j]
 
-                if case["value"] == 0:
-                    self.reveal([(i, j)])
-                elif case["value"] < 0:
-                    self.loose()
-                    print("Loose")
+                if not case["visible"]:  # Si on avait pas deja clické sur cette case
+                    case["visible"] = True
+
+                    if case["value"] == 0:
+                        self.reveal([(i, j)])
+                    elif case["value"] < 0:
+                        self.loose()
+                        print("Loose")
 
 
-                if case["value"] >= 0:
-                    self.score += self.step
-                    if self.score == self.scoreMax:
-                        print("Win")
-                    # Check de combien de case il reste
-                    # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.
+                    if case["value"] >= 0:
+                        self.score += self.step
+                        if self.score == self.scoreMax:
+                            print("Win")
+                        # Check de combien de case il reste
+                        # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.
 
-                self.draw()
+                    self.draw()
+            else:
+                pass

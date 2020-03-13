@@ -3,7 +3,7 @@ import sys, webbrowser
 sys.path.append("./modules")
 
 from UI import Menu
-import Config, Game
+import Config, Game, Smiley
 
 
 def motion(event):
@@ -13,17 +13,20 @@ def motion(event):
     playMenu.updateOnMotion(coords)
     mainMenu.updateOnMotion(coords)
 
-def mousePress(event):
+def leftClickPress(event):
     """Runs everytime the left click of the mouse is pressed."""
     game.updateOnPress()
     playMenu.updateOnPress()
     mainMenu.updateOnPress()
 
-def mouseRelease(event):
+def leftClickRelease(event):
     """Runs everytime the left click of the mouse is released."""
     playMenu.updateOnRelease()
     mainMenu.updateOnRelease()
 
+
+def rightClickRelease(event):
+    pass
 #### Variables ####
 width, height = 700, 700  # Taille de la fenetre
 
@@ -59,9 +62,13 @@ mainMenu.addButton( "Quit"    , root.destroy )
 
 mainMenu.start()
 
+Smiley = Smiley.Smiley(root, cv, 50, 50)
+
+
 #### Event sur le canvas  ####
 cv.bind('<Motion>', motion)
-cv.bind('<ButtonPress-1>', mousePress )
-cv.bind('<ButtonRelease-1>', mouseRelease )
+cv.bind('<ButtonPress-1>', leftClickPress )
+cv.bind('<ButtonRelease-1>', leftClickRelease )
+cv.bind('<ButtonRelease-3>', rightClickRelease )
 
 root.mainloop()
