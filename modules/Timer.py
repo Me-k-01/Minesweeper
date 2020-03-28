@@ -15,7 +15,6 @@ class Timer:
 
         self.cv.create_rectangle(x-75, y-25, x+75, y+25, fill="#9592b4", outline="", tag="Timer")
         self.id = None
-
         self.initialTime = time()
         self.draw()
 
@@ -50,3 +49,7 @@ class Timer:
     def start(self):
         self.continueCounter = True
         self.update()
+
+    def isRunning(self):
+        """Return true when the timer is running"""
+        return self.continueCounter

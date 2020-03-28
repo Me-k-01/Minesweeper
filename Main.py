@@ -1,5 +1,4 @@
-from tkinter import Tk, Text, Canvas, PhotoImage
-from tkinter.font import Font
+from tkinter import Tk, Canvas, PhotoImage
 
 import sys, webbrowser
 sys.path.append("./modules")
@@ -36,10 +35,6 @@ myTheme = Config.createTheme( Config.themes["Primary"]["Night"],
 
 #### Set up de la fenetre Tkinter ####
 root = Tk()
-
-text = Text(root)
-myFont = Font(family="Times New Roman", size=12)
-text.configure(font=myFont)
 cv = Canvas(root, width=width, height=height, bg=myTheme["Primary"]["background"])
 cv.pack()
 

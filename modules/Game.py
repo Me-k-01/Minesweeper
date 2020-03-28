@@ -92,7 +92,6 @@ class Game:
         self.cheat = False  # Le cheat est de base inactif
 
         self.firstClick = True
-        self.firstClickAfterLoad = False
         self.selectionIndex = None
         self.revealLoopId = None
 
@@ -145,7 +144,6 @@ class Game:
         self.active = True
         self.gameOver = False
         self.firstClick = True
-        self.firstClickAfterLoad = False
         self.mf.placeMine()
         self.score = 0
         self.scoreMax = (( self.n * self.p ) - self.bomb) * self.step
@@ -190,7 +188,6 @@ class Game:
             self.stopReveal()
             self.timer.stop()
             self.active = True
-            self.firstClickAfterLoad = True
             self.firstClick = False  # On ne modifie pas le champs de mine lors du premier click vu qu'on veut charger un champs de mine
             self.mf = data["mf"]
             self.timer.load(data["time"])
@@ -318,16 +315,13 @@ class Game:
                 if self.firstClick: # Si c'est ble premier clique,
                     self.firstClick = False
                     self.mf.placeMine(i, j)  # On place les mine en fonction de l'emplacement du clique
-                    if self.timer != None:
-                        self.timer.start()
-                elif self.firstClickAfterLoad:
-                    self.firstClickAfterLoad = False
-                    self.timer.start()
+
                 case = self.mf.m[i][j]
 
                 if not case["visible"]:  # Si on avait pas deja clické sur cette case
                     case["visible"] = True
-
+                    if not self.timer.isRunning():
+                        self.timer.start()
                     if case["value"] == 0:
                         self.reveal([(i, j)])
                     elif case["value"] < 0:
