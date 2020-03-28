@@ -43,4 +43,4 @@
 
 ![](img/mouseFR.png)
 
-[Répertoire du projet](https://github.com/Me-k-01/Projet_Python)
+[Dépot du projet](https://github.com/Me-k-01/Projet_Python)

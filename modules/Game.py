@@ -88,9 +88,11 @@ class Game:
         self.cv = cv
         self.theme = theme
 
+        self.active = True
         self.cheat = False  # Le cheat est de base inactif
 
         self.firstClick = True
+        self.firstClickAfterLoad = False
         self.selectionIndex = None
         self.revealLoopId = None
 
@@ -140,14 +142,17 @@ class Game:
 
     def start(self):
         self.stopReveal()
-
+        self.active = True
+        self.gameOver = False
         self.firstClick = True
+        self.firstClickAfterLoad = False
         self.mf.placeMine()
         self.score = 0
         self.scoreMax = (( self.n * self.p ) - self.bomb) * self.step
         self.draw()
         if self.timer != None:
-            self.timer.restart()
+            self.timer.stop()
+            self.timer.reset()
 
     def mkNotif(self, txt, color="Default"):
         """Faire des notifications sur le canvas."""
@@ -161,6 +166,10 @@ class Game:
         self.root.after(t, lambda: self.cv.delete(idBlock, idTxt))
 
     def save(self):
+        if self.gameOver:
+            self.mkNotif("You cannot save when the game is over.", self.theme["Primary"]["warning"])
+            return
+
         if self.revealLoopId == None:  # Si on est pas encore en train de reveler des cases sur le champs
             data = {"mf": self.mf,
                     "time": self.timer.save(),
@@ -177,8 +186,11 @@ class Game:
         data = IE.load()
         if data != -1:  # Si on a pas eut d'erreur
             # On arrette tout revelation des cases en cours
+            self.gameOver = False
             self.stopReveal()
-
+            self.timer.stop()
+            self.active = True
+            self.firstClickAfterLoad = True
             self.firstClick = False  # On ne modifie pas le champs de mine lors du premier click vu qu'on veut charger un champs de mine
             self.mf = data["mf"]
             self.timer.load(data["time"])
@@ -264,6 +276,8 @@ class Game:
 
     def loose(self):
         """Lorsque l'on perd"""
+        self.active = False
+        self.timer.stop()
         for i in range(self.n):
             for j in range(self.p):
                 case = self.mf.m[i][j]
@@ -271,6 +285,13 @@ class Game:
                     case["visible"] = True
         self.draw()
 
+        self.gameOver = True
+
+    def win(self):
+        """Lorsque l'on gagne"""
+        self.active = False
+        self.timer.stop()
+        self.gameOver = True
 
     def updateOnMotion(self, coords):
         """Update on click"""
@@ -289,7 +310,7 @@ class Game:
 
     def updateOnPress(self, state ="right"):
 
-        if self.selectionIndex != None:  # Si on a une selection
+        if self.selectionIndex != None and self.active:  # Si on a une selection
             i, j = self.selectionIndex
 
             if state == "right":
@@ -297,7 +318,11 @@ class Game:
                 if self.firstClick: # Si c'est ble premier clique,
                     self.firstClick = False
                     self.mf.placeMine(i, j)  # On place les mine en fonction de l'emplacement du clique
-
+                    if self.timer != None:
+                        self.timer.start()
+                elif self.firstClickAfterLoad:
+                    self.firstClickAfterLoad = False
+                    self.timer.start()
                 case = self.mf.m[i][j]
 
                 if not case["visible"]:  # Si on avait pas deja clické sur cette case
@@ -313,6 +338,7 @@ class Game:
                     if case["value"] >= 0:
                         self.score += self.step
                         if self.score == self.scoreMax:
+                            self.win()
                             print("Win")
                         # Check de combien de case il reste
                         # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.

@@ -10,8 +10,7 @@ class Smiley :
         self.path = "./img/emoticons/" # Path
         self.emotions =  ["happy", "pokerface","bad","dead"]
 
-        img = tkinter.PhotoImage(file = self.path + 'happy.png')
-
+        img = tkinter.PhotoImage(file=self.path + "happy.png")
 
         self.cns.create_rectangle(self.x, self.y, w, w, fill="#1111AA")
         self.cns.create_image(self.x, self.y, image=img)

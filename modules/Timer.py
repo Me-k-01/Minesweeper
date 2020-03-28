@@ -9,13 +9,15 @@ class Timer:
         self.x = x
         self.y = y
 
-        self.initialTime = time()
         self.timeWhenSaved = None
         self.timeWhenLoading = None
+        self.continueCounter = False
 
         self.cv.create_rectangle(x-75, y-25, x+75, y+25, fill="#9592b4", outline="", tag="Timer")
         self.id = None
-        self.updating()
+
+        self.initialTime = time()
+        self.draw()
 
     def save(self):
         return [self.initialTime, time()]
@@ -25,16 +27,26 @@ class Timer:
         deltaTime = time() - timeWhenSaved
         self.initialTime = initialTime + deltaTime
 
+    def stop(self):
+        self.continueCounter = False
 
-    def updating(self):
+    def draw(self):
         t = int(time() - self.initialTime)
+        txt = timeFormater(seconds=t)
 
         if self.id != None:
             self.cv.delete(self.id)
-
-        txt = timeFormater(seconds=t)
         self.id = self.cv.create_text(self.x, self.y, fill="#141417",font="Arial 22", text=txt, tag="Timer")
-        self.root.after(200, self.updating)
 
-    def restart(self):
+    def update(self):
+        self.draw()
+        if self.continueCounter:
+            self.root.after(200, self.update)
+
+    def reset(self):
         self.initialTime = time()
+        self.draw()
+
+    def start(self):
+        self.continueCounter = True
+        self.update()
