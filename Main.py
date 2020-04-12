@@ -4,7 +4,7 @@ import sys, webbrowser
 sys.path.append("./modules")
 
 from UI import Menu
-import Config, Game, Smiley
+import Config, Game
 
 def motion(event):
     """Runs everytime the cursor moves on the tkinter window."""
@@ -42,7 +42,7 @@ cv.pack()
 cv.create_rectangle( width * 3 // 4, 0, width, height, fill=myTheme["Primary"]["game"][0], outline="", tag="UI")
 cv.create_rectangle( 0, 0, width, height//5, fill=myTheme["Primary"]["interface"], outline="", tag="UI")
 
-game = Game.Game(root, cv, (10, 150), 400, myTheme)
+game = Game.Game(root, cv, (10, 150), width, myTheme)
 game.start()
 
 #### Menu jouer  ####
@@ -50,19 +50,17 @@ playMenu = Menu(cv, width - 400, height//5 , 200, 100, myTheme["Scheme"]["button
 playMenu.selfDestruct = True
 
 playMenu.addButton("New  Game", game.start)
-playMenu.addButton("Load"    , game.load)
+playMenu.addButton("Load", game.load)
 
 #### Menu Principale  ####
 mainMenu = Menu(cv, width - 200, height//5 , 200, 100, myTheme["Scheme"]["button"], [ playMenu ])
-mainMenu.addButton( "Play"    , playMenu.start )
-mainMenu.addButton( "Save"    , game.save )
-mainMenu.addButton( "Help"  , lambda : webbrowser.open('https://github.com/Me-k-01/Projet_Python') )
+mainMenu.addButton( "Play", playMenu.start )
+mainMenu.addButton( "Save", game.save )
+mainMenu.addButton( "Help", lambda : webbrowser.open('https://github.com/Me-k-01/Projet_Python') )
 mainMenu.addButton( "Settings", lambda : print("Comming Soon") )
-mainMenu.addButton( "Quit"    , root.destroy )
+mainMenu.addButton( "Quit", root.destroy )
 
 mainMenu.start()
-Smiley = Smiley.Smiley(cv, width//2, 75)
-
 
 #### Event sur le canvas  ####
 cv.bind('<Motion>', motion)

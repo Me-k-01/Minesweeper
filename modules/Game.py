@@ -1,6 +1,6 @@
 from random import randrange as rdm
 import Save as IE
-import Timer
+import Timer, Smiley
 
 #def disp(M) :
 #    for l in M:
@@ -66,18 +66,19 @@ class MineField :
 
 
 class Game:
-    def __init__(self, root, cv, offset, length, theme):
+    def __init__(self, root, cv, offset, windowWidth, theme):
         self.n = 10  # Hauteur
         self.p = 10  # Longueur
         self.bomb = 9# Nombre de bombe
 
         #### Dimension ####
         self.xOffset, self.yOffset = offset # coordonnés a partir duquelle on peut dessiner le champ de mine
-        self.width = length # Longueur du champ de mine
-        self.caseLength = ( length // self.p ) - 2  # Taille des blocks
+        self.trueWidth = windowWidth
+        self.width = windowWidth - 250 # Longueur du champ de mine
+        self.caseLength = ( self.width // self.p ) - 2  # Taille des blocks
         self.caseSpace = 2 # Taille de l'espacement
         self.height = ( self.caseLength + self.caseSpace ) * self.n
-        self.yAlign = self.yOffset //2
+        self.yAlign = self.yOffset // 2 # Coord y pour l'alignement des widgets
 
         ####  Score   ####
         self.score = 0
@@ -96,11 +97,16 @@ class Game:
         self.revealLoopId = None
 
         self.mf = MineField(self.n, self.p, self.bomb)
-        self.timer = Timer.Timer(root, cv, self.width + 200, self.yAlign)
+        self.timer = Timer.Timer(root, cv, self.trueWidth*3//4, self.yAlign)
+        self.smiley = Smiley.Smiley(cv, self.trueWidth//2, self.yAlign)
+
+
 
     def changeDim(self, n, p):
         self.n = n
         self.p = p
+        self.caseLength = ( self.width // self.p ) - 2  # Taille des blocks
+        self.height = ( self.caseLength + self.caseSpace ) * self.n
         self.start()
 
     def destroy(self):
@@ -118,7 +124,8 @@ class Game:
         self.destroy()  # On supprime le precedant champ de mine du canvas
 
         score = str(self.score) + " / " + str(self.scoreMax)
-        self.cv.create_text(self.width // 3, self.yAlign, fill=self.theme["Secondary"][1], font="Arial 22", text=score, tag="Score")
+        self.cv.create_text(self.width // 3, self.yAlign - 20, fill=self.theme["Secondary"][1], font="Arial 22", text="Score: " + str(score), tag="Score")
+        self.cv.create_text(self.width // 3, self.yAlign + 20, fill=self.theme["Primary"]["warning"], font="Arial 22", text="Mines: "+str(self.bomb), tag="Score")
 
         for i in range(self.n):
             for j in range(self.p):
