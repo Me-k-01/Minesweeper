@@ -96,7 +96,7 @@ class Game:
         self.revealLoopId = None
 
         self.mf = MineField(self.n, self.p, self.bomb)
-        self.timer = Timer.Timer(root, cv, self.width - 20, self.yAlign)
+        self.timer = Timer.Timer(root, cv, self.width + 200, self.yAlign)
 
     def changeDim(self, n, p):
         self.n = n

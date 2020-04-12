@@ -61,8 +61,7 @@ mainMenu.addButton( "Settings", lambda : print("Comming Soon") )
 mainMenu.addButton( "Quit"    , root.destroy )
 
 mainMenu.start()
-
-Smiley = Smiley.Smiley(root, cv, 50, 50)
+Smiley = Smiley.Smiley(cv, width//2, 75)
 
 
 #### Event sur le canvas  ####
