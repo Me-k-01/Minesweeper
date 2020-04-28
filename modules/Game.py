@@ -245,6 +245,10 @@ class Game:
 
         else:  # Quand la case n'a pas deja ete revelé
             self.cv.create_rectangle(x-space, y-space, x+w, y+w,fill=self.theme["Primary"]["notification"], outline="", tag="MF_Selection")
+            if case["flagged"]:
+                self.cv.create_rectangle(x+w//3, y+w//4, x+w//3+2, y + w*3//4, fill=self.theme["Primary"]["game"][0], outline="", tag="MF_Selection")
+                self.cv.create_polygon(x+w//3, y+w//4, x+w//3 +10,  y + w//4 + 5, x+w//3, y + w//4 +10, fill=self.theme["Primary"]["game"][0], outline="", tag="MF_Selection")
+
             if case["value"] < 0 and self.cheat and not self.firstClick:  # Si l'on est sur une bombe et que l'on triche
                 self.root.config(cursor="circle")
 
@@ -319,12 +323,12 @@ class Game:
         else:
             self.select()
 
-    def updateOnPress(self, state ="right"):
+    def updateOnPress(self, state ="left"):
 
         if self.selectionIndex != None and self.active:  # Si on a une selection
             i, j = self.selectionIndex
 
-            if state == "right":
+            if state == "left":
 
                 if self.firstClick: # Si c'est ble premier clique,
                     self.firstClick = False
@@ -348,9 +352,11 @@ class Game:
                         if self.score == self.scoreMax:
                             self.win()
                             print("Win")
-                        # Check de combien de case il reste
-                        # S'il reste plus que le nombre de bombe et que l'on a pas perdu, c'est que l'on a gagner.
 
-                    self.draw()
             else:
-                pass
+                case = self.mf.m[i][j]
+                # Cas ou c'est un click droit
+                if not case["visible"]:
+                    case["flagged"] = not case["flagged"]
+
+            self.draw()

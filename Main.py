@@ -13,20 +13,20 @@ def motion(event):
     playMenu.updateOnMotion(coords)
     mainMenu.updateOnMotion(coords)
 
-def leftClickPress(event):
+def mousePress(event, button="left"):
     """Runs everytime the left click of the mouse is pressed."""
-    game.updateOnPress()
+    game.updateOnPress(button)
     playMenu.updateOnPress()
     mainMenu.updateOnPress()
 
-def leftClickRelease(event):
+def mouseRelease(event, button="left"):
     """Runs everytime the left click of the mouse is released."""
     playMenu.updateOnRelease()
     mainMenu.updateOnRelease()
 
 
-def rightClickRelease(event):
-    pass
+
+
 #### Variables ####
 width, height = 700, 700  # Taille de la fenetre
 
@@ -64,8 +64,9 @@ mainMenu.start()
 
 #### Event sur le canvas  ####
 cv.bind('<Motion>', motion)
-cv.bind('<ButtonPress-1>', leftClickPress )
-cv.bind('<ButtonRelease-1>', leftClickRelease )
-cv.bind('<ButtonRelease-3>', rightClickRelease )
+cv.bind('<ButtonPress-1>', mousePress )
+cv.bind('<ButtonPress-3>', lambda evt: mousePress(evt, "right") )
+cv.bind('<ButtonRelease-1>', mouseRelease )
+cv.bind('<ButtonRelease-3>', lambda evt: mouseRelease(evt, "right") )
 
 root.mainloop()
