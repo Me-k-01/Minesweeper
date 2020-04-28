@@ -27,7 +27,11 @@ class MineField :
             for i in range(n):
                 matrice.append([])
                 for j in range(p):
-                    matrice[i].append({"value": 0, "visible": False}) # state: 0 = invisible | 1 = visible
+                    matrice[i].append({
+                        "value": 0,
+                        "visible": False,
+                        "flagged": False
+                    }) # state: 0 = invisible | 1 = visible
             return matrice
 
         def addToAdj(m, x, y):
@@ -142,6 +146,9 @@ class Game:
 
                 else:  # Si le contenu de la case n'est pas révelé
                     self.cv.create_rectangle(x, y, x+w, y+w,fill=self.theme["Primary"]["game"][0], outline="", tag="MineField")
+                    if case["flagged"]:
+                        self.cv.create_rectangle(x+w//3, y+w//4, x+w//3+2, y + w*3//4, fill=self.theme["Primary"]["warning"], outline="", tag="MineField")
+                        self.cv.create_polygon(x+w//3, y+w//4, x+w//3 +10,  y + w//4 + 5, x+w//3, y + w//4 +10, fill=self.theme["Primary"]["warning"], outline="", tag="MineField")
                 x += d
             x = self.xOffset
             y += d
