@@ -14,13 +14,13 @@ def motion(event):
     mainMenu.updateOnMotion(coords)
 
 def mousePress(event, button="left"):
-    """Runs everytime the left click of the mouse is pressed."""
+    """Runs everytime the click of the mouse is pressed."""
     game.updateOnPress(button)
     playMenu.updateOnPress()
     mainMenu.updateOnPress()
 
 def mouseRelease(event, button="left"):
-    """Runs everytime the left click of the mouse is released."""
+    """Runs everytime the click of the mouse is released."""
     playMenu.updateOnRelease()
     mainMenu.updateOnRelease()
 
